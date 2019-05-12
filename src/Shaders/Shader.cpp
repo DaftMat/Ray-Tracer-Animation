@@ -64,11 +64,11 @@ Shader::Shader(const char* vertexPath, const char* fragmentPath) {
     glDeleteShader(fragment);
 }
 
-Shader::~Shader() {
+void Shader::Delete() {
     glDeleteProgram(ID);
 }
 
-void Shader::use() {
+void Shader::use() const {
     glUseProgram(ID);
 }
 
@@ -92,8 +92,17 @@ void Shader::setVec3f(const std::string &name, const glm::vec3 &value) const {
     glUniform3fv(glGetUniformLocation(ID, name.c_str()), 1, &value[0]);
 }
 
-void Shader::setVec3f(const std::string &name, float x, float y, float z) {
+void Shader::setVec3f(const std::string &name, float x, float y, float z) const {
     setVec3f(name, glm::vec3(x, y, z));
+}
+
+void Shader::setMaterial(const std::string &name, const Material &material) const {
+    setVec3f("material.defaultDiffuse", material.diffuse);
+    setVec3f("material.defaultSpecular", material.specular);
+    setFloat("material.shininess", material.shininess);
+    setBool("material.diffTex", material.diffTex);
+    setBool("material.specTex", material.specTex);
+    setBool("material.png", material.pngTex);
 }
 
 void Shader::checkCompileErrors(unsigned int shader, std::string type){

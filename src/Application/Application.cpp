@@ -5,6 +5,9 @@
 #include "Application.hpp"
 
 Application::Application(float screenWidth, float screenHeight) : lastX(screenWidth), lastY(screenHeight) {
+    this->screenHeight = screenHeight;
+    this->screenWidth = screenWidth;
+
     glfwInit();
     glfwWindowHint(GLFW_CONTEXT_VERSION_MAJOR, 3);
     glfwWindowHint(GLFW_CONTEXT_VERSION_MINOR, 3);
@@ -38,15 +41,23 @@ Application::Application(float screenWidth, float screenHeight) : lastX(screenWi
     glEnable(GL_DEPTH_TEST);
     glDepthFunc(GL_LESS);
 
-    glEnable(GL_CULL_FACE);
+    //glEnable(GL_CULL_FACE);
     glCullFace(GL_FRONT);
     glFrontFace(GL_CW);
 }
 
-void Application::addModel(const Model &model, unsigned int shaderIndex) {
+Application::~Application() {
+    for (auto & shader : shaders)
+        shader.Delete();
+    for (auto & model : models)
+        model.Delete();
+}
+
+void Application::addModel(Model &model, unsigned int shaderIndex) {
     RenderObject ro;
-    ro.index = shaderIndex;
-    ro.model = model;
+    ro.shader = shaderIndex;
+    ro.model = models.size();
+    models.emplace_back(model);
     objects.emplace_back(ro);
 }
 
@@ -66,29 +77,43 @@ void Application::Run() {
 
         processInput();
 
-        glClearColor(.2f, .2f, .2f, 1.f);
+        glClearColor(.1f, .2f, .25f, 1.f);
         glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
 
         ///Draw all objects :
-        for (auto & ro : objects) {
-            shaders[ro.index].use();
+        for (const auto & ro : objects) {
+            shaders[ro.shader].use();
 
-            shaders[ro.index].setMat4f("view", camera.getView());
-            shaders[ro.index].setMat4f("model", ro.model.getTransform());
+            shaders[ro.shader].setMat4f("projection", glm::perspective(glm::radians(camera.getFov()), screenWidth / screenHeight, 0.1f, 100.0f));
+            shaders[ro.shader].setMat4f("view", camera.getView());
+            shaders[ro.shader].setMat4f("model", models[ro.model].getTransform());
+            shaders[ro.shader].setVec3f("viewPos", camera.getPos());
 
-            ro.model.Draw(shaders[ro.index]);
+            if (shaders[ro.shader].isWireframe())
+                glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+            else
+                glPolygonMode(GL_FRONT_AND_BACK, GL_FILL);
+
+            models[ro.model].Draw(shaders[ro.shader]);
         }
 
         glfwSwapBuffers(m_window);
         glfwPollEvents();
     }
-
-    glfwTerminate();
 }
 
 void Application::processInput() {
     if (glfwGetKey(m_window, GLFW_KEY_ESCAPE) == GLFW_PRESS)
         glfwSetWindowShouldClose(m_window, true);
+    //camera control
+    if (glfwGetKey(m_window, GLFW_KEY_W) == GLFW_PRESS)
+        camera.processKeyboard(FORWARD, m_deltaTime);
+    if (glfwGetKey(m_window, GLFW_KEY_S) == GLFW_PRESS)
+        camera.processKeyboard(BACKWARD, m_deltaTime);
+    if (glfwGetKey(m_window, GLFW_KEY_A) == GLFW_PRESS)
+        camera.processKeyboard(LEFT, m_deltaTime);
+    if (glfwGetKey(m_window, GLFW_KEY_D) == GLFW_PRESS)
+        camera.processKeyboard(RIGHT, m_deltaTime);
 }
 
 void Application::mouse_callback(double xpos, double ypos) {

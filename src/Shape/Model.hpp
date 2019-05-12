@@ -5,7 +5,7 @@
 #ifndef OPENGLTUTO_MODEL_HPP
 #define OPENGLTUTO_MODEL_HPP
 
-#include "../../src/Shape/Mesh.hpp"
+#include "../Shape/Mesh.hpp"
 #include <stb_image.h>
 
 #include <assimp/Importer.hpp>
@@ -22,6 +22,7 @@ enum PrimitiveType {
     CUBE,       //center, resolution
     PLANE,      //center,
     CONE,
+    PYRAMID,
     COMPLEX
 };
 
@@ -36,11 +37,19 @@ class Model {
     std::vector<Texture> loadMaterialTextures(aiMaterial *mat, aiTextureType type, std::string typeName);
 
     ///Primitive utils
-    unsigned int resolution {2};        //nb of triangles/lines
-    PrimitiveType type {COMPLEX};       //not a primitive -> complex
+    unsigned int m_resolution;        //nb of triangles/lines
+    PrimitiveType m_type {COMPLEX};       //not a primitive -> complex
+
+    void constructSphere();
+    void constructCylinder();
+    void constructCube();
+    void constructPlane();
+    void constructCone();
+    void constructPyramid();
 
     ///general utils
     glm::mat4 transform {glm::mat4(1.f)};
+    glm::mat4 localTransform {glm::mat4(1.f)};
 
 public:
     std::vector<Mesh> meshes;
@@ -51,18 +60,18 @@ public:
      * Constructor that loads a model from obj file
      * @param path - path to obj file
      */
-    Model(char *path) {loadModel(path);}
+    explicit Model(char *path) {loadModel(path);}
 
     /**
      * Constructor that loads a primitive model
      * @param type - type of primitive, see @PrimitiveType
      * @param resolution - number of triangles in a primitive's face (ex : 2 -> 2 triangles per face for a cube)
      */
-    Model(PrimitiveType type, unsigned int resolution);
+    Model(PrimitiveType type, unsigned int resolution = 10);
 
     Model& operator=(const Model &model);
 
-    ~Model();
+    void Delete();
 
     /**
      * Transformation matrix setter

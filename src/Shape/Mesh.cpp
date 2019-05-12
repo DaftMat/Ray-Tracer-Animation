@@ -4,15 +4,16 @@
 
 #include "Mesh.hpp"
 
-Mesh::Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices, std::vector<Texture> textures) {
+Mesh::Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices, Material material, std::vector<Texture> textures) {
     this->vertices = vertices;
     this->indices = indices;
+    this->material = material;
     this->textures = textures;
 
     setupMesh();
 }
 
-Mesh::~Mesh() {
+void Mesh::Delete() {
     glDeleteVertexArrays(1, &VAO);
     glDeleteBuffers(1, &VBO);
     glDeleteBuffers(1, &EBO);

@@ -4,23 +4,183 @@
 
 #include "Model.hpp"
 
+Model::Model(PrimitiveType type, unsigned int resolution) : m_type(type), m_resolution(resolution) {
+    switch (type) {
+        case SPHERE:
+            constructSphere();
+            break;
+        case PYRAMID:
+            constructPyramid();
+            break;
+        default:
+            break;
+    }
+}
+
+void Model::constructSphere() {
+    std::vector<glm::vec3> directions = {
+            glm::vec3(0.f, 0.f, 1.f),   //front
+            glm::vec3(0.f, 0.f,-1.f),   //back
+            glm::vec3(0.f, 1.f, 0.f),   //up
+            glm::vec3(0.f,-1.f, 0.f),   //bottom
+            glm::vec3(1.f, 0.f, 0.f),   //left
+            glm::vec3(-1.f,0.f, 0.f)    //right
+    };
+
+    std::vector<Vertex> vertices;
+    std::vector<unsigned int> triangles;
+    std::vector<Texture> textures; //still empty in this function
+    Material material;
+    material.diffuse = glm::vec3(.3f, .3f, .3f);
+    material.specular = glm::vec3(.8f, .8f, .8f);
+    material.shininess = 1.f;
+    material.diffTex = false;
+    material.specTex = false;
+    material.pngTex = false;
+    glm::vec3 axisA;
+    glm::vec3 axisB;
+
+    for (int i = 0 ; i < 6 ; ++i) {
+        axisA = glm::vec3(directions[i].y, directions[i].z, directions[i].x);
+        axisB = glm::cross(directions[i], axisA);
+
+        for (int y = 0 ; y < m_resolution ; ++y) {
+            for (int x = 0 ; x < m_resolution ; ++x) {
+                unsigned int index = x + y * m_resolution;
+                glm::vec2 percent = glm::vec2(x, y) / (m_resolution - 1.f);
+                glm::vec3 pointOnUnitCube = directions[i] + (percent.x - .5f) * 2 * axisA + (percent.y - .5f) * 2 * axisB;
+                glm::vec3 pointOnUnitSphere = glm::normalize(pointOnUnitCube);
+
+                Vertex vertex;
+                vertex.Position = pointOnUnitSphere;
+                vertex.Normal = pointOnUnitSphere;
+                vertex.TexCoords = percent;
+                vertex.Tangent = glm::normalize(glm::cross(axisB, pointOnUnitSphere));
+                vertex.Bitangent = glm::normalize(glm::cross(vertex.Tangent, pointOnUnitSphere));
+                vertices.emplace_back(vertex);
+
+                if (x != m_resolution - 1 && y != m_resolution - 1) {
+                    triangles.emplace_back(index);
+                    triangles.emplace_back(index + m_resolution + 1);
+                    triangles.emplace_back(index + m_resolution);
+
+                    triangles.emplace_back(index);
+                    triangles.emplace_back(index + 1);
+                    triangles.emplace_back(index + m_resolution + 1);
+                }
+            }
+        }
+
+        meshes.emplace_back(Mesh(vertices, triangles, material, textures));
+
+        vertices.clear();
+        triangles.clear();
+    }
+}
+
+void Model::constructPyramid() {
+    glm::vec3 up = glm::vec3(0.f, 1.f, 0.f);
+    glm::vec3 axisA = glm::vec3(up.y, up.z, up.x);
+    glm::vec3 axisB = glm::cross(up, axisA);
+    std::vector<glm::vec3> directions = {
+            glm::vec3(0.f, 0.f, 1.f),   //front
+            glm::vec3(0.f, 0.f,-1.f),   //back
+            glm::vec3(1.f, 0.f, 0.f),   //left
+            glm::vec3(-1.f,0.f, 0.f)
+    };
+
+    std::vector<Vertex> vertices;
+    std::vector<unsigned int> triangles;
+    std::vector<Texture> textures;
+    Material material;
+    material.diffuse = glm::vec3(.3f, .3f, .3f);
+    material.specular = glm::vec3(.8f, .8f, .8f);
+    material.shininess = 1.f;
+    material.diffTex = false;
+    material.specTex = false;
+    material.pngTex = false;
+
+    for (int y = 0 ; y < m_resolution ; ++y) {
+        for (int x = 0 ; x < m_resolution ; ++x) {
+            unsigned int index = x + y * m_resolution;
+            glm::vec2 percent = glm::vec2(x, y) / (m_resolution - 1.f);
+            glm::vec3 pointOnUnitPlane = (percent.x - .5f) * 2 * axisA + (percent.y - .5f) * 2 * axisB;
+
+            Vertex vertex;
+            vertex.Position = pointOnUnitPlane;
+            vertex.Normal = -up;
+            vertex.TexCoords = percent;
+            vertex.Tangent = axisA;
+            vertex.Bitangent = axisB;
+            vertices.emplace_back(vertex);
+
+            if (x != m_resolution - 1 && y != m_resolution - 1) {
+                triangles.emplace_back(index);
+                triangles.emplace_back(index + m_resolution + 1);
+                triangles.emplace_back(index + m_resolution);
+
+                triangles.emplace_back(index);
+                triangles.emplace_back(index + 1);
+                triangles.emplace_back(index + m_resolution + 1);
+            }
+        }
+    }
+
+    meshes.emplace_back(Mesh(vertices, triangles, material, textures));
+    vertices.clear();
+    triangles.clear();
+
+    for (int i = 0 ; i < 4 ; ++i) {
+        Vertex vertex;
+        vertex.Position = up;
+        vertex.Normal = glm::normalize(up + directions[i]);
+        vertex.TexCoords = glm::vec2(0.f, 0.f);
+        vertex.Tangent = glm::cross(vertex.Normal, up);
+        vertex.Bitangent = glm::cross(vertex.Normal, vertex.Tangent);
+        vertices.emplace_back(vertex);
+
+        if (i < 2) {
+            vertex.Position = directions[i] + directions[2];
+            vertices.emplace_back(vertex);
+            vertex.Position = directions[i] + directions[3];
+            vertices.emplace_back(vertex);
+        } else {
+            vertex.Position = directions[i] + directions[0];
+            vertices.emplace_back(vertex);
+            vertex.Position = directions[i] + directions[1];
+            vertices.emplace_back(vertex);
+        }
+
+        triangles.emplace_back(0);
+        triangles.emplace_back(1);
+        triangles.emplace_back(2);
+
+        meshes.emplace_back(Mesh(vertices, triangles, material, textures));
+        vertices.clear();
+        triangles.clear();
+    }
+}
+
 Model& Model::operator=(const Model &model) {
     directory = model.directory;
-    type = model.type;
-    resolution = model.resolution;
+    m_type = model.m_type;
+    m_resolution = model.m_resolution;
     transform = model.transform;
     textures_loaded = model.textures_loaded;
     meshes = model.meshes;
     return *this;
 }
 
-Model::~Model() {
-    for (const auto &texture : textures_loaded)
+void Model::Delete() {
+    for (auto &texture : textures_loaded)
         glDeleteTextures(1, &texture.id);
+    for (auto &mesh : meshes)
+        mesh.Delete();
 }
 
 void Model::Draw(const Shader &shader) const {
-    for (auto &mesh : meshes) {
+    for (const auto &mesh : meshes) {
+        shader.setMaterial("material", mesh.material);
         mesh.Draw(shader);
     }
 }
@@ -126,8 +286,16 @@ Mesh Model::processMesh(aiMesh *mesh, const aiScene *scene)
     std::vector<Texture> heightMaps = loadMaterialTextures(material, aiTextureType_AMBIENT, "texture_height");
     textures.insert(textures.end(), heightMaps.begin(), heightMaps.end());
 
+    Material materialMesh;
+    materialMesh.diffuse = glm::vec3(.3f, .3f, .3f);
+    materialMesh.specular = glm::vec3(.8f, .8f, .8f);
+    materialMesh.shininess = 1.f;
+    materialMesh.diffTex = false;
+    materialMesh.specTex = false;
+    materialMesh.pngTex = false;
+
     // return a mesh object created from the extracted mesh data
-    return Mesh(vertices, indices, textures);
+    return Mesh(vertices, indices, materialMesh, textures);
 }
 
 std::vector<Texture> Model::loadMaterialTextures(aiMaterial *mat, aiTextureType type, std::string typeName)

@@ -38,12 +38,13 @@ class Mesh {
 public:
     std::vector<Vertex> vertices;
     std::vector<unsigned int> indices;
+    Material material;
     std::vector<Texture> textures;
 
     Mesh() = default;
-    Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices, std::vector<Texture> textures);
+    Mesh(std::vector<Vertex> vertices, std::vector<unsigned int> indices, Material material, std::vector<Texture> textures);
 
-    ~Mesh();
+    void Delete();
 
     void Draw(const Shader &shader) const;
     void setupMesh();

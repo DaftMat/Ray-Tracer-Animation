@@ -12,16 +12,19 @@
 
 #include "../Shaders/Shader.hpp"
 #include "../Shape/Model.hpp"
-#include "../Cameras/OrthoCamera.hpp"
+#include "../Cameras/Camera.hpp"
 
 #include <vector>
 
 struct RenderObject {
-    unsigned int index; //shader index in the application
-    Model model;        //model that is printed
+    unsigned int shader;    //shader index in the application
+    unsigned int model;     //model that is printed
 };
 
 class Application {
+    float screenWidth;
+    float screenHeight;
+
     float m_deltaTime {0.f};
     float m_lastFrame {0.f};
     float m_refreshTime {0.f};
@@ -34,9 +37,10 @@ class Application {
     GLFWwindow *m_window;
 
     std::vector<Shader> shaders;
+    std::vector<Model> models;
     std::vector<RenderObject> objects;
 
-    OrthoCamera camera;
+    Camera camera;
 
     bool error {false};
 
@@ -48,9 +52,10 @@ class Application {
 
 public:
     Application(float screenWidth, float screenHeight);
+    ~Application();
 
-    void addShader(Shader shader) {shaders.emplace_back(shader);}
-    void addModel(const Model &model, unsigned int shaderIndex);
+    void addShader(Shader &shader) {shaders.emplace_back(shader);}
+    void addModel(Model &model, unsigned int shaderIndex);
 
     void Run();
 };
