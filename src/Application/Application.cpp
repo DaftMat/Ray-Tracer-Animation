@@ -88,6 +88,7 @@ void Application::Run() {
             shaders[ro.shader].setMat4f("view", camera.getView());
             shaders[ro.shader].setMat4f("model", models[ro.model].getTransform());
             shaders[ro.shader].setVec3f("viewPos", camera.getPos());
+            shaders[ro.shader].setMaterial("material", models[ro.model].getMaterial());
 
             if (shaders[ro.shader].isWireframe())
                 glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);

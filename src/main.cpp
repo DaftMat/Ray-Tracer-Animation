@@ -43,6 +43,14 @@ int main() {
     Model sphere2(SPHERE, 26);
     sphere2.setTransform(glm::scale(sphere2.getTransform(), glm::vec3(.2f, .2f, .2f)));
     sphere2.setTransform(glm::translate(sphere2.getTransform(), glm::vec3(0.f, 1.f, 2.2f)));
+    Material sphere2Mat;
+    sphere2Mat.pngTex = false;
+    sphere2Mat.specTex = false;
+    sphere2Mat.diffTex = false;
+    sphere2Mat.diffuse = glm::vec3(.8f, .1f, .3f);
+    sphere2Mat.specular = glm::vec3(.8f, .6f, .9f);
+    sphere2Mat.shininess = 0.5f;
+    sphere2.setMaterial(sphere2Mat);
 
     app.addModel(sphere, 0);
     app.addModel(sphere2, 0);

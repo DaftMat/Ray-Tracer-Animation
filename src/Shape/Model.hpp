@@ -40,6 +40,8 @@ class Model {
     unsigned int m_resolution;        //nb of triangles/lines
     PrimitiveType m_type {COMPLEX};       //not a primitive -> complex
 
+    Material m_material;
+
     void constructSphere();
     void constructCylinder();
     void constructCube();
@@ -84,6 +86,18 @@ public:
      * @return model's transformation
      */
     const glm::mat4 & getTransform() const { return transform; }
+
+    /**
+     * Material setter
+     * @param material - new material
+     */
+    void setMaterial(const Material &material) { m_material = material; }
+
+    /**
+     * Material getter
+     * @return material of the model
+     */
+    const Material & getMaterial() const { return m_material; }
 
     /**
      * Draws the model using the specified shader

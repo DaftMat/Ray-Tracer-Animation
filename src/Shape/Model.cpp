@@ -30,13 +30,12 @@ void Model::constructSphere() {
     std::vector<Vertex> vertices;
     std::vector<unsigned int> triangles;
     std::vector<Texture> textures; //still empty in this function
-    Material material;
-    material.diffuse = glm::vec3(.3f, .3f, .3f);
-    material.specular = glm::vec3(.8f, .8f, .8f);
-    material.shininess = 1.f;
-    material.diffTex = false;
-    material.specTex = false;
-    material.pngTex = false;
+    m_material.diffuse = glm::vec3(.3f, .3f, .3f);
+    m_material.specular = glm::vec3(.8f, .8f, .8f);
+    m_material.shininess = 1.f;
+    m_material.diffTex = false;
+    m_material.specTex = false;
+    m_material.pngTex = false;
     glm::vec3 axisA;
     glm::vec3 axisB;
 
@@ -71,7 +70,7 @@ void Model::constructSphere() {
             }
         }
 
-        meshes.emplace_back(Mesh(vertices, triangles, material, textures));
+        meshes.emplace_back(Mesh(vertices, triangles, textures));
 
         vertices.clear();
         triangles.clear();
@@ -92,13 +91,12 @@ void Model::constructPyramid() {
     std::vector<Vertex> vertices;
     std::vector<unsigned int> triangles;
     std::vector<Texture> textures;
-    Material material;
-    material.diffuse = glm::vec3(.3f, .3f, .3f);
-    material.specular = glm::vec3(.8f, .8f, .8f);
-    material.shininess = 1.f;
-    material.diffTex = false;
-    material.specTex = false;
-    material.pngTex = false;
+    m_material.diffuse = glm::vec3(.3f, .3f, .3f);
+    m_material.specular = glm::vec3(.8f, .8f, .8f);
+    m_material.shininess = 1.f;
+    m_material.diffTex = false;
+    m_material.specTex = false;
+    m_material.pngTex = false;
 
     for (int y = 0 ; y < m_resolution ; ++y) {
         for (int x = 0 ; x < m_resolution ; ++x) {
@@ -126,7 +124,7 @@ void Model::constructPyramid() {
         }
     }
 
-    meshes.emplace_back(Mesh(vertices, triangles, material, textures));
+    meshes.emplace_back(Mesh(vertices, triangles, textures));
     vertices.clear();
     triangles.clear();
 
@@ -155,7 +153,7 @@ void Model::constructPyramid() {
         triangles.emplace_back(1);
         triangles.emplace_back(2);
 
-        meshes.emplace_back(Mesh(vertices, triangles, material, textures));
+        meshes.emplace_back(Mesh(vertices, triangles, textures));
         vertices.clear();
         triangles.clear();
     }
@@ -180,7 +178,6 @@ void Model::Delete() {
 
 void Model::Draw(const Shader &shader) const {
     for (const auto &mesh : meshes) {
-        shader.setMaterial("material", mesh.material);
         mesh.Draw(shader);
     }
 }
@@ -286,16 +283,15 @@ Mesh Model::processMesh(aiMesh *mesh, const aiScene *scene)
     std::vector<Texture> heightMaps = loadMaterialTextures(material, aiTextureType_AMBIENT, "texture_height");
     textures.insert(textures.end(), heightMaps.begin(), heightMaps.end());
 
-    Material materialMesh;
-    materialMesh.diffuse = glm::vec3(.3f, .3f, .3f);
-    materialMesh.specular = glm::vec3(.8f, .8f, .8f);
-    materialMesh.shininess = 1.f;
-    materialMesh.diffTex = false;
-    materialMesh.specTex = false;
-    materialMesh.pngTex = false;
+    m_material.diffuse = glm::vec3(.3f, .3f, .3f);
+    m_material.specular = glm::vec3(.8f, .8f, .8f);
+    m_material.shininess = 1.f;
+    m_material.diffTex = false;
+    m_material.specTex = false;
+    m_material.pngTex = false;
 
     // return a mesh object created from the extracted mesh data
-    return Mesh(vertices, indices, materialMesh, textures);
+    return Mesh(vertices, indices, textures);
 }
 
 std::vector<Texture> Model::loadMaterialTextures(aiMaterial *mat, aiTextureType type, std::string typeName)
