@@ -71,6 +71,15 @@ public:
      */
     Model(PrimitiveType type, unsigned int resolution = 10);
 
+    /**
+     * Constructor that loads a line from p1 to p2;
+     * @param p1
+     * @param p2
+     */
+    Model(glm::vec3 p1, glm::vec3 p2);
+
+    void addLine(glm::vec3 p1, glm::vec3 p2);
+
     Model& operator=(const Model &model);
 
     void Delete();

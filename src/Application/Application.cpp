@@ -51,6 +51,8 @@ Application::~Application() {
         shader.Delete();
     for (auto & model : models)
         model.Delete();
+    for (auto & light : pointLights)
+        light.Delete();
 }
 
 void Application::addModel(Model &model, unsigned int shaderIndex) {
@@ -98,6 +100,17 @@ void Application::Run() {
             models[ro.model].Draw(shaders[ro.shader]);
         }
 
+        for (const auto & light : pointLights) {
+            shaders[lightShader].use();
+
+            shaders[lightShader].setMat4f("projection", glm::perspective(glm::radians(camera.getFov()), screenWidth / screenHeight, 0.1f, 100.0f));
+            shaders[lightShader].setMat4f("view", camera.getView());
+            shaders[lightShader].setMat4f("model", light.getLightModel().getTransform());
+
+            glPolygonMode(GL_FRONT_AND_BACK, GL_LINE);
+            light.getLightModel().Draw(shaders[lightShader]);
+        }
+
         glfwSwapBuffers(m_window);
         glfwPollEvents();
     }
@@ -131,4 +144,12 @@ void Application::mouse_callback(double xpos, double ypos) {
     lastY = ypos;
 
     camera.processMouseMovement(xoffset, yoffset);
+}
+
+void Application::addPointLight(PointLight &light) {
+    for (const auto & shader : shaders) {
+        shader.use();
+        shader.addPointLight(light.getLight(), pointLights.size());
+    }
+    pointLights.emplace_back(light);
 }

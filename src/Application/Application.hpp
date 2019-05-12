@@ -13,6 +13,7 @@
 #include "../Shaders/Shader.hpp"
 #include "../Shape/Model.hpp"
 #include "../Cameras/Camera.hpp"
+#include "../Lights/PointLight.hpp"
 
 #include <vector>
 
@@ -34,10 +35,13 @@ class Application {
     float lastX;
     float lastY;
 
+    unsigned int lightShader;
+
     GLFWwindow *m_window;
 
     std::vector<Shader> shaders;
     std::vector<Model> models;
+    std::vector<PointLight> pointLights;
     std::vector<RenderObject> objects;
 
     Camera camera;
@@ -56,6 +60,9 @@ public:
 
     void addShader(Shader &shader) {shaders.emplace_back(shader);}
     void addModel(Model &model, unsigned int shaderIndex);
+    void addPointLight(PointLight &light);
+
+    void setLightShaderIndex(unsigned int index)    {lightShader = index;}
 
     void Run();
 };

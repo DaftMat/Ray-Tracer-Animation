@@ -1,7 +1,7 @@
 #version 330 core
 out vec4 FragColor;
 
-#define NR_TEXTURE_MAX 256
+#define NR_POINT_LIGHTS_MAX 50
 
 struct Material {
     sampler2D texture_diffuse1;
@@ -49,16 +49,13 @@ struct SpotLight {
     vec3 specular;
 };
 
-#define NR_POINT_LIGHTS 1
-
 in vec3 FragPos;
 in vec3 Normal;
 in vec2 TexCoords;
 
+uniform int nr_point_lights;
 uniform vec3 viewPos;
-uniform DirLight dirLight;
-uniform PointLight pointLights[NR_POINT_LIGHTS];
-uniform SpotLight spotLight;
+uniform PointLight pointLights[NR_POINT_LIGHTS_MAX];
 uniform Material material;
 
 // function prototypes
@@ -93,7 +90,7 @@ void main()
     //vec3 result = CalcDirLight(dirLight, norm, viewDir);
     vec3 result = vec3(0.0);
     // phase 2: point lights
-    for(int i = 0; i < NR_POINT_LIGHTS; i++)
+    for(int i = 0 ; i < nr_point_lights ; i++)
         result += CalcPointLight(pointLights[i], norm, FragPos, viewDir);
     // phase 3: spot light
     //result += CalcSpotLight(spotLight, norm, FragPos, viewDir);

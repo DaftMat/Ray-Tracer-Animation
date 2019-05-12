@@ -23,6 +23,18 @@ struct Material {
     bool pngTex;
 };
 
+struct Light {
+    glm::vec3 position;
+
+    float constant;
+    float linear;
+    float quadratic;
+
+    glm::vec3 ambient;
+    glm::vec3 diffuse;
+    glm::vec3 specular;
+};
+
 class Shader {
 public:
     //program ID
@@ -49,6 +61,7 @@ public:
     void setVec3f(const std::string &name, const glm::vec3 &value) const;
     void setVec3f(const std::string &name, float x, float y, float z) const;
     void setMaterial(const std::string&name, const Material &material) const;
+    void addPointLight(const Light &light, unsigned int numLight) const;
 
     bool isWireframe() const { return wireframe; }
     void setWireframe(bool w) { wireframe = w; }

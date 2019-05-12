@@ -7,28 +7,28 @@
 Application app(1080, 1080);
 
 int main() {
+    //Configure shaders
     Shader lightingShader("../src/Shaders/shaders/lighting.vertex", "../src/Shaders/shaders/lighting.fragment");
-    //Edit shader
     lightingShader.use();
 
-    //add dir light
-    lightingShader.setVec3f("pointLights[0].position", 0.0f, 1.f, 1.0f);
-    lightingShader.setVec3f("pointLights[0].ambient", 0.2f, 0.2f, 0.2f);
-    lightingShader.setVec3f("pointLights[0].diffuse", 1.0f, 1.0f, 1.0f);
-    lightingShader.setVec3f("pointLights[0].specular", 1.f, 1.0f, 1.0f);
-    lightingShader.setFloat("pointLights[0].constant", .2f);
-    lightingShader.setFloat("pointLights[0].linear", .2f);
-    lightingShader.setFloat("pointLights[0].quadratic", .2f);
     lightingShader.setWireframe(false);
 
     app.addShader(lightingShader);
 
+
     Shader borderShader("../src/Shaders/shaders/border.vertex", "../src/Shaders/shaders/border.fragment");
     borderShader.use();
+
     borderShader.setVec3f("color", .8f, .8f, .8f);
     borderShader.setWireframe(true);
 
     app.addShader(borderShader);
+
+    //Configure light
+    app.setLightShaderIndex(1);
+
+    PointLight light(glm::vec3(0.0f, 1.f, 1.f), .2f, .2f, .2f, glm::vec3(.2f, .2f, .2f), glm::vec3(1.f, 1.f, 1.f), glm::vec3(1.f, 1.f, 1.f));
+    app.addPointLight(light);
 
     Model pyramid(PYRAMID, 10);
     pyramid.setTransform(glm::translate(pyramid.getTransform(), glm::vec3(0.f, 0.2f, .0f)));
@@ -52,9 +52,15 @@ int main() {
     sphere2Mat.shininess = 0.5f;
     sphere2.setMaterial(sphere2Mat);
 
+    Model line(glm::normalize(glm::vec3(-1.f, 1.f, 0.f)) + glm::normalize(glm::vec3(-1.f, 1.f, 0.f)) * 0.4f + glm::vec3(0.f, .2f, 0.f), glm::vec3(0.f, .2f, 0.f) + glm::normalize(glm::vec3(-1.f, 1.f, 0.f)) * 0.2f);
+    Model line2(glm::vec3(0.f, .2f, 0.f) + glm::normalize(glm::vec3(-1.f, 1.f, 0.f)) * 0.2f, light.getLight().position);
+
     app.addModel(sphere, 0);
     app.addModel(sphere2, 0);
     app.addModel(pyramid, 1);
+    app.addModel(line, 1);
+    app.addModel(line2, 1);
+
 
     //run animation
     app.Run();

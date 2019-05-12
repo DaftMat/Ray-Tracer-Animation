@@ -4,6 +4,10 @@
 
 #include "Model.hpp"
 
+Model::Model(glm::vec3 p1, glm::vec3 p2) {
+    addLine(p1, p2);
+}
+
 Model::Model(PrimitiveType type, unsigned int resolution) : m_type(type), m_resolution(resolution) {
     switch (type) {
         case SPHERE:
@@ -157,6 +161,31 @@ void Model::constructPyramid() {
         vertices.clear();
         triangles.clear();
     }
+}
+
+void Model::addLine(glm::vec3 p1, glm::vec3 p2) {
+    std::vector<Vertex> vertices;
+    std::vector<unsigned int> triangles;
+    std::vector<Texture> textures;
+
+    Vertex vertex;
+    vertex.Position = p1;
+    vertex.Normal = glm::vec3(0.f, 0.f, 0.f);
+    vertex.TexCoords = glm::vec2(0.f, 0.f);
+    vertex.Tangent = glm::vec3(0.f, 0.f, 0.f);
+    vertex.Bitangent = glm::vec3(0.f, 0.f, 0.f);
+
+    vertices.emplace_back(vertex);
+
+    vertex.Position = p2;
+
+    vertices.emplace_back(vertex);
+
+    triangles.emplace_back(0);
+    triangles.emplace_back(1);
+    triangles.emplace_back(0);
+
+    meshes.emplace_back(Mesh(vertices, triangles, textures));
 }
 
 Model& Model::operator=(const Model &model) {
@@ -323,7 +352,6 @@ std::vector<Texture> Model::loadMaterialTextures(aiMaterial *mat, aiTextureType 
     }
     return textures;
 }
-
 
 unsigned int TextureFromFile(const char *path, const std::string &directory, bool gamma)
 {

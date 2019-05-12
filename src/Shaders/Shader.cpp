@@ -105,6 +105,17 @@ void Shader::setMaterial(const std::string &name, const Material &material) cons
     setBool("material.png", material.pngTex);
 }
 
+void Shader::addPointLight(const Light &light, unsigned int numLight) const {
+    setVec3f("pointLights["+std::to_string(numLight)+"].position", light.position);
+    setVec3f("pointLights["+std::to_string(numLight)+"].ambient", light.ambient);
+    setVec3f("pointLights["+std::to_string(numLight)+"].diffuse", light.diffuse);
+    setVec3f("pointLights["+std::to_string(numLight)+"].specular", light.specular);
+    setFloat("pointLights["+std::to_string(numLight)+"].constant", light.constant);
+    setFloat("pointLights["+std::to_string(numLight)+"].linear", light.linear);
+    setFloat("pointLights["+std::to_string(numLight)+"].quadratic", light.quadratic);
+    setInt("nr_point_lights", numLight + 1);
+}
+
 void Shader::checkCompileErrors(unsigned int shader, std::string type){
     int success;
     char infoLog[1024];
