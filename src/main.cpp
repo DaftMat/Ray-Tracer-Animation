@@ -40,23 +40,10 @@ int main() {
     sphere.setTransform(glm::scale(sphere.getTransform(), glm::vec3(.2f, .2f, .2f)));
     sphere.setTransform(glm::translate(sphere.getTransform(), glm::vec3(0.f, 1.f, .0f)));
 
-    Model sphere2(SPHERE, 26);
-    sphere2.setTransform(glm::scale(sphere2.getTransform(), glm::vec3(.2f, .2f, .2f)));
-    sphere2.setTransform(glm::translate(sphere2.getTransform(), glm::vec3(0.f, 1.f, 2.2f)));
-    Material sphere2Mat;
-    sphere2Mat.pngTex = false;
-    sphere2Mat.specTex = false;
-    sphere2Mat.diffTex = false;
-    sphere2Mat.diffuse = glm::vec3(.8f, .1f, .3f);
-    sphere2Mat.specular = glm::vec3(.8f, .6f, .9f);
-    sphere2Mat.shininess = 0.5f;
-    sphere2.setMaterial(sphere2Mat);
-
     Model line(glm::normalize(glm::vec3(-1.f, 1.f, 0.f)) + glm::normalize(glm::vec3(-1.f, 1.f, 0.f)) * 0.4f + glm::vec3(0.f, .2f, 0.f), glm::vec3(0.f, .2f, 0.f) + glm::normalize(glm::vec3(-1.f, 1.f, 0.f)) * 0.2f);
     Model line2(glm::vec3(0.f, .2f, 0.f) + glm::normalize(glm::vec3(-1.f, 1.f, 0.f)) * 0.2f, light.getLight().position);
 
     app.addModel(sphere, 0);
-    app.addModel(sphere2, 0);
     app.addModel(pyramid, 1);
     app.addModel(line, 1);
     app.addModel(line2, 1);
