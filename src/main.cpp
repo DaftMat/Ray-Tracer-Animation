@@ -27,7 +27,7 @@ int main() {
     //Configure light
     app.setLightShaderIndex(1);
 
-    PointLight light(glm::vec3(0.0f, 1.f, 1.f), .2f, .2f, .2f, glm::vec3(.2f, .2f, .2f), glm::vec3(1.f, 1.f, 1.f), glm::vec3(1.f, 1.f, 1.f));
+    PointLight light(glm::vec3(0.0f, 1.f, 1.f), .2f, .2f, .2f, glm::vec3(.2f, .2f, .2f), glm::vec3(1.f, 1.f, 1.f), glm::vec3(.6f, .6f, .6f));
     app.addPointLight(light);
 
     Model pyramid(PYRAMID, 10);
@@ -39,6 +39,12 @@ int main() {
     Model sphere(SPHERE, 26);
     sphere.setTransform(glm::scale(sphere.getTransform(), glm::vec3(.2f, .2f, .2f)));
     sphere.setTransform(glm::translate(sphere.getTransform(), glm::vec3(0.f, 1.f, .0f)));
+    Material matSphere;
+    matSphere.pngTex = false;
+    matSphere.specTex = false;
+    matSphere.diffTex = false;
+    matSphere.diffuse = glm::vec3(.4f, .4f, .4f);
+    matSphere.specular = glm::vec3(.6f, .6f, .6f);
 
     Model line(glm::normalize(glm::vec3(-1.f, 1.f, 0.f)) + glm::normalize(glm::vec3(-1.f, 1.f, 0.f)) * 0.4f + glm::vec3(0.f, .2f, 0.f), glm::vec3(0.f, .2f, 0.f) + glm::normalize(glm::vec3(-1.f, 1.f, 0.f)) * 0.2f);
     Model line2(glm::vec3(0.f, .2f, 0.f) + glm::normalize(glm::vec3(-1.f, 1.f, 0.f)) * 0.2f, light.getLight().position);
